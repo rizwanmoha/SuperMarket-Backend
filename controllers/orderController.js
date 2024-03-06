@@ -9,7 +9,7 @@ const getAllOrders=async(req,res,next)=>
     {
         const { page=1, limit=10 }=req.query;
         const orders=await Order.find().limit(limit*1).skip((page-1)*limit).sort({ createdAt: -1 });
-
+        
         return res.json(orders);
     }
     catch(err)
@@ -20,7 +20,7 @@ const getAllOrders=async(req,res,next)=>
 const getUserOrders = async (req, res, next) => {
     try {
       const orders = await Order.find({ user: req.user._id });
-
+      
       return res.json(orders);
     }
     catch (err) {
@@ -100,7 +100,7 @@ const createOrder=async (req,res,next)=>
     try
     {
         const { items, totalAmount, shippingAddress, paymentMode }=req.body;
-
+        console.log(req.body);
         if (!items || !totalAmount || !shippingAddress || !paymentMode) {
             return res.status(400).json({ message: "Missing required fields" });
         }

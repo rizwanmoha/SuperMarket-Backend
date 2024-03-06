@@ -16,8 +16,10 @@ exports.getCart = async (req, res) => {
 exports.addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
   try {
+        console.log(req.user);
+        console.log(req.user._id);
       let cart = await Cart.findOne({ user: req.user._id });
-
+        console.log("first");
       // If cart doesn't exist, create a new one
       if (!cart) {
           cart = new Cart({ user: req.user._id, items: [] });
@@ -33,7 +35,7 @@ exports.addToCart = async (req, res) => {
           // If product doesn't exist, add it to the cart
           cart.items.push({ product: productId, quantity });
       }
-
+      console.log("second");
       await cart.save();
       res.json(cart);
   } catch (error) {
