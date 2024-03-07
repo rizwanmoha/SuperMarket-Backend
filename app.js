@@ -2,28 +2,28 @@ require("dotenv").config();
 const express=require("express");
 const mongoose=require("mongoose");
 const cors=require("cors");
-const corsOptions=require("./config/corsOptions");
-const connectDB=require("./config/db");
+const corsOptions=require("./src/config/corsOptions");
+const connectDB=require("./src/config/db");
 const morgan=require("morgan");
 const multer=require("multer");
 const rfs=require("rotating-file-stream");
 const path = require("path");
 const app=express();
 
-const errorMiddleware=require("./middlewares/errorMiddleware");
-const notFoundMiddleware=require("./middlewares/notFoundMIddleware");
+const errorMiddleware=require("./src/middlewares/errorMiddleware");
+const notFoundMiddleware=require("./src/middlewares/notFoundMIddleware");
 
-const authRouter=require("./routers/authRouter");
-const userRouter=require("./routers/userRouter");
-const orderRouter=require("./routers/orderRouter");
-const blogRouter=require("./routers/blogRouter");
-const sellerRouter=require("./routers/sellerRouter");
-const productRouter = require("./routers/productRoutes");
-const cartRouter=require("./routers/cartRouter");
-const reviewRouter = require('./routers/reviewRouter');
-const contactRouter=require('./routers/contactRouter');
-const adminRouter=require('./routers/adminRouter')
-const { authenticateToken } = require("./middlewares/authMiddleware");
+const authRouter=require("./src/routers/authRouter");
+const userRouter=require("./src/routers/userRouter");
+const orderRouter=require("./src/routers/orderRouter");
+const blogRouter=require("./src/routers/blogRouter");
+const sellerRouter=require("./src/routers/sellerRouter");
+const productRouter = require("./src/routers/productRoutes");
+const cartRouter=require("./src/routers/cartRouter");
+const reviewRouter = require('./src/routers/reviewRouter');
+const contactRouter=require('./src/routers/contactRouter');
+const adminRouter=require('./src/routers/adminRouter')
+const { authenticateToken } = require("./src/middlewares/authMiddleware");
 
 //Database Connection
 connectDB();
@@ -33,7 +33,12 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static(path.join(__dirname, "public")));
+
+const publicPath = path.join(__dirname, 'src', 'public');
+
+// Set up Express to serve static files from the public directory
+app.use(express.static(publicPath));
 
 const accessStream=rfs.createStream('access.log',{
   interval: "1d",
@@ -55,7 +60,7 @@ const accessStream=rfs.createStream('access.log',{
 app.use(morgan(":method :url :status - :response-time ms",{ stream: accessStream }));
 
 // Multer file upload
-const upload=require("./utils/multer");
+const upload=require("./src/utils/multer");
 
 app.use('/api/auth',authRouter);
 
