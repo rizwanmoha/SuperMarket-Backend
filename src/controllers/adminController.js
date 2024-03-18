@@ -3,10 +3,20 @@ const Analytics = require("../models/analytics.js");
 const User = require("../models/User.js");
 const Order = require("../models/order.js")
 const Cart=require("../models/cart.js")
+const {allProductsService , updateUserProfileService} = require("../services/adminServices.js")
+
 const getAllProducts = async (req, res, next) => {
   try {
-    const products = await Product.find();
-    return res.json(products);
+    
+    const result = await allProductsService();
+    if (result.success) {
+      
+      return res.json(result.products);
+    } else {
+     
+      throw new Error("Failed to fetch products");
+    }
+
   } catch (err) {
     next(err);
   }
@@ -15,12 +25,15 @@ const updateUserProfile = async (req, res, next) => {
   try {
     const { id } = req.body
     const {update} = req.body;
-    const user = await User.findByIdAndUpdate(id, update, { new: true });
-
-    if (!user) {
+    
+    const result = await updateUserProfileService(id, update);
+    if(result.success){
+      return res.json(result.user);
+    }
+    else{
       return res.status(404).json({ msg: "User not found" });
     }
-    return res.json(user);
+
   } catch (err) {
     next(err);
   }
