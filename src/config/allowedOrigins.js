@@ -1,6 +1,6 @@
 const allowedOrigins=[
     "http://localhost:5173",
-    "https://rugged-five.vercel.app"
+    "https://innovationmarket.netlify.app"
 ]
 
 module.exports=allowedOrigins;
