@@ -1,16 +1,25 @@
 const Order=require("../models/order");
 // const RazorPay=require("razorpay");
+const Product = require('../models/product.js');
 const Cart = require('../models/cart');
 const crypto=require("crypto");
+const {getAllOrderServices , getUserOrderService, genericOrderService , deleteOrderService , cancelOrderService} = require('../services/orderServices.js');
 
 const getAllOrders=async(req,res,next)=>
 {
     try
     {
-        const { page=1, limit=10 }=req.query;
-        const orders=await Order.find().limit(limit*1).skip((page-1)*limit).sort({ createdAt: -1 });
+        // const { page=1, limit=10 }=req.query;
+        // const orders=await Order.find().limit(limit*1).skip((page-1)*limit).sort({ createdAt: -1 });
         
-        return res.json(orders);
+        // return res.json(orders);
+        const result = await getAllOrderServices();
+        if(result.success){
+          return res.status(result.status).json(result.orders);
+        }
+
+
+        return res.status(result.status).json({message : "Internal server error"});
     }
     catch(err)
     {
@@ -19,9 +28,15 @@ const getAllOrders=async(req,res,next)=>
 };
 const getUserOrders = async (req, res, next) => {
     try {
-      const orders = await Order.find({ user: req.user._id });
+      // const orders = await Order.find({ user: req.user._id });
       
-      return res.json(orders);
+      // return res.json(orders);
+      const result = await getUserOrderService(req.user._id);
+      if(result.success){
+        return res.status(result.status).json(result.orders);
+      }
+
+      return res.status(result.status).json({message : "Error while getting the orders"});
     }
     catch (err) {
         next(err)
@@ -31,9 +46,17 @@ const getPlacedOrders=async(req,res,next)=>
 {
     try
     {
-        const orders=await Order.find({ status: "placed" });
+        // const orders=await Order.find({ status: "placed" });
 
-        return res.json(orders);
+        // return res.json(orders);
+
+        const result = await genericOrderService("placed");
+
+        if(result.success){
+          return res.status(result.status).json(result.orders);
+        }
+
+        return res.status(result.status).json({message : "Error while getting the orders"});
     }
     catch(err)
     {
@@ -42,9 +65,16 @@ const getPlacedOrders=async(req,res,next)=>
 };
 const getShippedOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({ status: "shipped" });
+    // const orders = await Order.find({ status: "shipped" });
 
-    return res.json(orders);
+    // return res.json(orders);
+    const result = await genericOrderService("shipped");
+
+        if(result.success){
+          return res.status(result.status).json(result.orders);
+        }
+
+        return res.status(result.status).json({message : "Error while getting the orders"});
   } catch (err) {
     next(err);
   }
@@ -53,9 +83,16 @@ const getDeliveredOrders=async(req,res,next)=>
 {
     try
     {
-        const orders=await Order.find({ status: "delivered" });
+        // const orders=await Order.find({ status: "delivered" });
 
-        return res.json(orders);
+        // return res.json(orders);
+        const result = await genericOrderService("delivered");
+
+        if(result.success){
+          return res.status(result.status).json(result.orders);
+        }
+
+        return res.status(result.status).json({message : "Error while getting the orders"});
     }
     catch(err)
     {
@@ -67,9 +104,16 @@ const getCancelledOrders=async(req,res,next)=>
 {
     try
     {
-        const orders=await Order.find({ status: "cancelled" });
+        // const orders=await Order.find({ status: "cancelled" });
 
-        return res.json(orders);
+        // return res.json(orders);
+        const result = await genericOrderService("cancelled");
+
+        if(result.success){
+          return res.status(result.status).json(result.orders);
+        }
+
+        return res.status(result.status).json({message : "Error while getting the orders"});
     }
     catch(err)
     {
@@ -202,19 +246,28 @@ const cancelOrder=async(req,res,next)=>
     try
     {
         const { id } = req.body;
-        const order=await Order.findById(id);
+        // const order=await Order.findById(id);
 
-        if(!order)
-        {
-            return res.status(404).json({ msg: "Order not found" });
-        }
-         if (order.status === "cancelled") {
-           return res.status(400).json({ msg: "Order already cancelled" });
-         }
-        order.status="cancelled";
-        order.save();
+        // if(!order)
+        // {
+        //     return res.status(404).json({ msg: "Order not found" });
+        // }
+        //  if (order.status === "cancelled") {
+        //    return res.status(400).json({ msg: "Order already cancelled" });
+        //  }
+        // order.status="cancelled";
+        // order.save();
 
-        return res.json(order);
+        // return res.json(order);
+
+      const result = await cancelOrderService(id);
+
+      if(!result.success){
+        return res.status(result.status).json({message : result.message});
+      }
+      return res.status(result.status).json(result.order);
+
+
     }
     catch(err)
     {
@@ -228,14 +281,21 @@ const deleteOrder=async(req,res,next)=>
     {
         const { id }=req.params;
 
-        const order=await Order.findByIdAndDelete(id);
+        // const order=await Order.findByIdAndDelete(id);
 
-        if(!order)
-        {
-            return res.status(404).json({ msg: "Order not found" });
+        // if(!order)
+        // {
+        //     return res.status(404).json({ msg: "Order not found" });
+        // }
+
+        // return res.json({ msg: "Order deleted successfully" });
+
+        const result = await deleteOrderService(id);
+        if(result.success){
+          return res.status(result.status).json({message : result.message});
         }
 
-        return res.json({ msg: "Order deleted successfully" });
+        return res.status(result.status).json({message : result.message});
     }
     catch(err)
     {

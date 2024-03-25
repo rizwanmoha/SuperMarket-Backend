@@ -1,20 +1,34 @@
 const Product = require("../models/product");
+const {getProductByIdService, getAllProductService} = require('../services/productServices.js');
 
 const getProductById = async (req, res, next) => {
   try {
     const productId = req.query.productId;
-    let product = await Product.findById(productId);
-    res.status(200).json(product);
+    // let product = await Product.findById(productId);
+    // res.status(200).json(product);
+    const result = await getProductByIdService(productId);
+    if(result.success){
+      return res.status(result.status).json(result.product);
+    }
+    return res.status(result.status).json({message : "error while getting the product"});
+
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 };
 const getAllProducts = async (req, res, next) => {
   try {
-    let products = await Product.find();
-    res.status(200).json(products);
+    // let products = await Product.find();
+    // res.status(200).json(products);
+    const result = await getAllProductService();
+    if(result.success){
+      return res.status(result.status).json(result.products);
+
+    }
+    return res.status(result.status).json(result.message);
   } catch (error) {
-    res.status(500).json(error);
+    // res.status(500).json(error);
+    next(error);
   }
 };
 const getAverageRating = (product) => {

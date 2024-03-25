@@ -2,58 +2,69 @@ const Product = require("../models/product");
 const Analytics = require("../models/analytics");
 const User = require("../models/User")
 const Order = require("../models/order")
-const Cart=require("../models/cart")
+const Cart=require("../models/cart");
+const {getAllProductsService , addProductService , updateProductService , deleteProductService , becomeSellerService , getSellerDetailService , updateDetailService} = require('../services/SellerService');
 const getAllProducts = async (req, res, next) => {
   try {
-    const products = await Product.find({ seller: req.user._id });
-    // console.log(req.user)
-    return res.json(products);
+    const user = req.user._id;
+  
+    const result = await getAllProductsService(user);
+    if(result.success){
+      return res.status(result.status).json(result.products);
+
+    }
+
+    return res.status(result.status).json({message : result.message});
   } catch (err) {
     next(err);
   }
 };
 const addProduct = async (req, res, next) => {
   try {
-    const { productName, shortDescription, price, brand, stockQuantity, discount, length, width, height, description, imageUrls, tags,categories, colors } = req.body
-    if (!productName ||
-      !shortDescription ||
-      !price ||
-      !brand ||
-      !stockQuantity ||
-      !discount ||
-      !length ||
-      !width ||
-      !height ||
-      !description ||
-      !imageUrls ||
-      !categories ||
-      !colors
-    ) {
-      return res.status(400).json({ msg: "Missing Information" });
+    // const { productName, shortDescription, price, brand, stockQuantity, discount, length, width, height, description, imageUrls, tags,categories, colors } = req.body
+    // if (!productName ||
+    //   !shortDescription ||
+    //   !price ||
+    //   !brand ||
+    //   !stockQuantity ||
+    //   !discount ||
+    //   !length ||
+    //   !width ||
+    //   !height ||
+    //   !description ||
+    //   !imageUrls ||
+    //   !categories ||
+    //   !colors
+    // ) {
+    //   return res.status(400).json({ msg: "Missing Information" });
+    // }
+    // const product = new Product({
+    //   name: productName,
+    //   shortDescription,
+    //   description,
+    //   price:parseInt(price),
+    //   brand,
+    //   tags:tags.map((tag) => { return tag.name }),
+    //   categories: categories.map((category) => { return category.name }),
+    //   images: imageUrls.map((image) => ({type: "image", source: image.name })),
+    //   stockQuantity: parseInt(stockQuantity),
+    //   seller: req.user._id,
+    //   reviews: [],
+    //   ratingCounts: {},
+    //   discount,
+    //   colours: colors.map((color) => (color.name)),
+    //   dimensions: {
+    //     length: parseFloat(length),
+    //     width: parseFloat(width),
+    //     height:parseFloat(height),
+    //   }
+    // });
+    // await product.save();
+    // return res.status(201).json({ msg: "Product Created Successfully" });
+    const result = await addProductService(req.body);
+    if(result.success){
+      return res.status(result.status).json({msg : "Product Created Successfully"});
     }
-    const product = new Product({
-      name: productName,
-      shortDescription,
-      description,
-      price:parseInt(price),
-      brand,
-      tags:tags.map((tag) => { return tag.name }),
-      categories: categories.map((category) => { return category.name }),
-      images: imageUrls.map((image) => ({type: "image", source: image.name })),
-      stockQuantity: parseInt(stockQuantity),
-      seller: req.user._id,
-      reviews: [],
-      ratingCounts: {},
-      discount,
-      colours: colors.map((color) => (color.name)),
-      dimensions: {
-        length: parseFloat(length),
-        width: parseFloat(width),
-        height:parseFloat(height),
-      }
-    });
-    await product.save();
-    return res.status(201).json({ msg: "Product Created Successfully" });
   }
   catch (error){
      next(error)
@@ -61,136 +72,154 @@ const addProduct = async (req, res, next) => {
 }
 const updateProduct = async (req, res, next) => {
   try {
-    const { id } = req.body;
-    const {
-      productName,
-      shortDescription,
-      price,
-      brand,
-      stockQuantity,
-      discount,
-      length,
-      width,
-      height,
-      description,
-      imageUrls,
-      tags,
-      categories,
-      colors,
-      seller_id
-    } = req.body;
-    if (
-      !id ||
-      !productName ||
-      !shortDescription ||
-      !price ||
-      !brand ||
-      !stockQuantity ||
-      !discount ||
-      !length ||
-      !width ||
-      !height ||
-      !description ||
-      !imageUrls ||
-      !categories ||
-      !colors ||
-      !seller_id
-    ) {
-      return res.status(400).json({ msg: "Missing Information" });
-    }
-    if (imageUrls.length == 0) {
-      return res.status(400).json({ msg: "Missing Information" });
-    }
-    if (seller_id !== String(req.user._id)) {
-      return res.status(401).json({ msg: "Unauthorized" });
-    }
-    const product = {
-      name: productName,
-      shortDescription,
-      description,
-      price: parseInt(price),
-      brand,
-      tags: tags.map((tag) => {
-        return tag.name;
-      }),
-      categories: categories.map((category) => {
-        return category.name;
-      }),
-      images: imageUrls.map((image) => ({
-        type: "image",
-        source: image.name,
-      })),
-      stockQuantity: parseInt(stockQuantity),
-      discount,
-      colours: colors.map((color) => color.name),
-      dimensions: {
-        length: parseFloat(length),
-        width: parseFloat(width),
-        height: parseFloat(height),
-      },
-    };
+    // const { id } = req.body;
+    // const {
+    //   productName,
+    //   shortDescription,
+    //   price,
+    //   brand,
+    //   stockQuantity,
+    //   discount,
+    //   length,
+    //   width,
+    //   height,
+    //   description,
+    //   imageUrls,
+    //   tags,
+    //   categories,
+    //   colors,
+    //   seller_id
+    // } = req.body;
+    // if (
+    //   !id ||
+    //   !productName ||
+    //   !shortDescription ||
+    //   !price ||
+    //   !brand ||
+    //   !stockQuantity ||
+    //   !discount ||
+    //   !length ||
+    //   !width ||
+    //   !height ||
+    //   !description ||
+    //   !imageUrls ||
+    //   !categories ||
+    //   !colors ||
+    //   !seller_id
+    // ) {
+    //   return res.status(400).json({ msg: "Missing Information" });
+    // }
+    // if (imageUrls.length == 0) {
+    //   return res.status(400).json({ msg: "Missing Information" });
+    // }
+    // if (seller_id !== String(req.user._id)) {
+    //   return res.status(401).json({ msg: "Unauthorized" });
+    // }
+    // const product = {
+    //   name: productName,
+    //   shortDescription,
+    //   description,
+    //   price: parseInt(price),
+    //   brand,
+    //   tags: tags.map((tag) => {
+    //     return tag.name;
+    //   }),
+    //   categories: categories.map((category) => {
+    //     return category.name;
+    //   }),
+    //   images: imageUrls.map((image) => ({
+    //     type: "image",
+    //     source: image.name,
+    //   })),
+    //   stockQuantity: parseInt(stockQuantity),
+    //   discount,
+    //   colours: colors.map((color) => color.name),
+    //   dimensions: {
+    //     length: parseFloat(length),
+    //     width: parseFloat(width),
+    //     height: parseFloat(height),
+    //   },
+    // };
 
-    const newproduct = await Product.findByIdAndUpdate(id, product, {
-      new: true,
-    });
-    if (!newproduct) {
-      return res.status(404).json({ msg: "Product not found" });
+    // const newproduct = await Product.findByIdAndUpdate(id, product, {
+    //   new: true,
+    // });
+    // if (!newproduct) {
+    //   return res.status(404).json({ msg: "Product not found" });
+    // }
+    // console.log(newproduct);
+    // res.json(newproduct);
+    const result = await updateProductService(req.body);
+    if(result.success){
+      return res.status(result.status).json(result.newproduct);
     }
-    console.log(newproduct);
-    res.json(newproduct);
+    return res.status(result.status).json({msg : result.message});
+
   } catch (error) {
     next(error);
   }
 };
 const deleteProduct = async (req, res, next) => {
   try {
-    const { id, seller_id } = req.body;
-    if (seller_id !== String(req.user._id)) {
-      return res.status(401).json({ msg: "Unauthorized" });
+    // const { id, seller_id } = req.body;
+    // if (seller_id !== String(req.user._id)) {
+    //   return res.status(401).json({ msg: "Unauthorized" });
+    // }
+    
+    // const product = await Product.findByIdAndDelete(id);
+
+    // if (!product) {
+    //   return res.status(404).json({ msg: "Product not found" });
+    // }
+
+    
+    // await Order.deleteMany({ "items.productId": id });
+
+    
+    // await Cart.updateMany({}, { $pull: { items: { product: id } } });
+
+    // return res.json({ msg: "Product deleted successfully" });
+    const result = await deleteProductService(req.body);
+    if(result.success){
+      return res.status(result.status).json({msg : "Product deleted successfully"});
     }
-    // Delete the product
-    const product = await Product.findByIdAndDelete(id);
 
-    if (!product) {
-      return res.status(404).json({ msg: "Product not found" });
-    }
-
-    // Delete all orders containing this product
-    await Order.deleteMany({ "items.productId": id });
-
-    // Remove the product from users' carts
-    await Cart.updateMany({}, { $pull: { items: { product: id } } });
-
-    return res.json({ msg: "Product deleted successfully" });
+    return res.status(result.status).json({msg : result.message});
   } catch (err) {
     next(err);
   }
 };
 const becomeSeller = async (req,res,next) => {
   try {
-    const { phone, accountNumber, upiId, about } = req.body
-    if (!phone || !accountNumber || !upiId || !about) {
-      return res.status(400).json({ msg: "Missing Information" });
-    }
+    // const { phone, accountNumber, upiId, about } = req.body
+    // if (!phone || !accountNumber || !upiId || !about) {
+    //   return res.status(400).json({ msg: "Missing Information" });
+    // }
+    // const userId = req.user._id;
+    // const user = await User.findById(userId);
+    //  if (!user) {
+    //    return res.status(404).json({ msg: "User not found" });
+    // }
+    // if (!user.roles.includes("seller")) {
+    //   user.roles.push("seller");
+    //   await user.save();
+    // }
+    // const analytic = new Analytics({
+    //   items: [],
+    //   seller_id: userId,
+    //   phone,
+    //   accountNumber,
+    //   upiId,
+    //   about
+    // })
+    // await analytic.save()
+    // return res.status(201).json({ msg: "Became Seller Success" });
     const userId = req.user._id;
-    const user = await User.findById(userId);
-     if (!user) {
-       return res.status(404).json({ msg: "User not found" });
-    }
-    if (!user.roles.includes("seller")) {
-      user.roles.push("seller");
-      await user.save();
-    }
-    const analytic = new Analytics({
-      items: [],
-      seller_id: userId,
-      phone,
-      accountNumber,
-      upiId,
-      about
-    })
-    await analytic.save()
-    return res.status(201).json({ msg: "Became Seller Success" });
+    const result  = await becomeSellerService(req.body , userId);
+    // if(result.success){
+      return res.status(result.status).json({msg : result.message});
+    // }
+
   }
   catch (err) {
       next(err)
@@ -198,29 +227,34 @@ const becomeSeller = async (req,res,next) => {
 }
 const getSellerDetails = async (req, res, next) => {
   try {
-    const analytics = await Analytics.findOne({ seller_id: req.user.id });
-    if (!analytics) {
-      return res
-        .status(404)
-        .json({ message: "Analytics data not found for this user" });
+    // const analytics = await Analytics.findOne({ seller_id: req.user.id });
+    // if (!analytics) {
+    //   return res
+    //     .status(404)
+    //     .json({ message: "Analytics data not found for this user" });
+    // }
+
+    // const { phone, accountNumber, upiId, about } = analytics;
+    
+    // res.json({ phone, accountNumber, upiId, about });
+    const sellerId = req.user._id;
+    const result = await getSellerDetailService(sellerId);
+    if(result.success){
+      return res.status(result.status).json({phone : result.phone, accountNumber : result.accountNumber, upiId : result.upiId, about : result.about});
     }
 
-    const { phone, accountNumber, upiId, about } = analytics;
-    console.log(phone)
-    console.log(accountNumber)
-    console.log(upiId)
-    console.log(about)
-    res.json({ phone, accountNumber, upiId, about });
+    return res.status(result.status).json({message : result.message });
+
   } catch (error) {
     next(error);
   }
 };
 const getAllAnalytics = async (req, res, next) => {
   try {
-    // Find all analytics data
+    
     const analyticsData = await Analytics.find().populate("items.productId");
 
-    // Process analytics data to extract product information
+   
     const productsData = analyticsData
       .map((analytics) => {
         return analytics.items.map((item) => {
@@ -240,38 +274,44 @@ const getAllAnalytics = async (req, res, next) => {
 }
     const updateDetails = async (req, res, next) => {
       try {
-        const { phone, accountNumber, upiId, about } = req.body; // Assuming sellerId and other fields are provided in the request body
+        // const { phone, accountNumber, upiId, about } = req.body; // Assuming sellerId and other fields are provided in the request body
 
-        // Construct the update object with the provided fields
-        const updateObj = {
-          phone,
-          accountNumber,
-          upiId,
-          about,
-        };
+        // // Construct the update object with the provided fields
+        // const updateObj = {
+        //   phone,
+        //   accountNumber,
+        //   upiId,
+        //   about,
+        // };
 
-        // Find and update the Analytics document by seller_id
-        const updatedAnalytics = await Analytics.findOneAndUpdate(
-          { seller_id: req.user._id },
-          updateObj,
-          {
-            new: true, // To return the updated document
-          }
-        );
+        // // Find and update the Analytics document by seller_id
+        // const updatedAnalytics = await Analytics.findOneAndUpdate(
+        //   { seller_id: req.user._id },
+        //   updateObj,
+        //   {
+        //     new: true, // To return the updated document
+        //   }
+        // );
 
-        if (!updatedAnalytics) {
-          return res
-            .status(404)
-            .json({ message: "Analytics data not found for the seller" });
+        // if (!updatedAnalytics) {
+        //   return res
+        //     .status(404)
+        //     .json({ message: "Analytics data not found for the seller" });
+        // }
+
+        // res.json({
+        //   message: "Analytics details updated successfully",
+        //   analytics: updatedAnalytics,
+        // });
+        const sellerId = req.user._id;
+        const result = await updateDetailService(req.body , sellerId);
+        if(result.success){
+          return res.status(result.status).json({analytics : result.analytics , message : "Analytics details updated successfully"});
         }
 
-        res.json({
-          message: "Analytics details updated successfully",
-          analytics: updatedAnalytics,
-        });
+        return res.status(result.status).json({message : result.message});
       } catch (error) {
-        // Handle errors
-        console.error("Error updating Analytics details:", error);
+        
         res.status(500).json({ message: "Internal Server Error" });
       }
     };
